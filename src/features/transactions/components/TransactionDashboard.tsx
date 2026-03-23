@@ -1,6 +1,5 @@
 "use client";
 
-import { useMemo } from "react";
 import { CreditCard, TrendingDown, TrendingUp, Activity } from "lucide-react";
 import { TransactionList } from "./TransactionList";
 import { TransactionFilters } from "./TransactionFilters";
@@ -18,6 +17,7 @@ export function TransactionDashboard({ accountId }: TransactionDashboardProps) {
   const {
     transactions,
     total,
+    summary,
     isLoading,
     isError,
     error,
@@ -26,17 +26,6 @@ export function TransactionDashboard({ accountId }: TransactionDashboardProps) {
     isFetchingNextPage,
     markAsReviewed,
   } = useTransactionHistory(accountId, filters);
-
-  // Derivar estadísticas de resumen sin re-renders innecesarios
-  const stats = useMemo(() => {
-    const credits = transactions.filter((t) => t.type === "credit");
-    const debits = transactions.filter((t) => t.type === "debit");
-    const totalCredit = credits.reduce((acc, t) => acc + t.amount, 0);
-    const totalDebit = debits.reduce((acc, t) => acc + t.amount, 0);
-    const pending = transactions.filter((t) => t.status === "pending").length;
-
-    return { credits: credits.length, debits: debits.length, totalCredit, totalDebit, pending };
-  }, [transactions]);
 
   const formatMXN = (amount: number) =>
     new Intl.NumberFormat("es-MX", { style: "currency", currency: "MXN" }).format(
@@ -56,19 +45,19 @@ export function TransactionDashboard({ accountId }: TransactionDashboardProps) {
         <StatCard
           icon={<TrendingUp className="h-5 w-5 text-emerald-500" />}
           label="Créditos"
-          value={formatMXN(stats.totalCredit)}
+          value={formatMXN(summary.totalCredit)}
           bg="bg-emerald-50 dark:bg-emerald-900/20"
         />
         <StatCard
           icon={<TrendingDown className="h-5 w-5 text-red-500" />}
           label="Débitos"
-          value={formatMXN(stats.totalDebit)}
+          value={formatMXN(summary.totalDebit)}
           bg="bg-red-50 dark:bg-red-900/20"
         />
         <StatCard
           icon={<CreditCard className="h-5 w-5 text-yellow-500" />}
           label="Pendientes"
-          value={String(stats.pending)}
+          value={String(summary.pendingCount)}
           bg="bg-yellow-50 dark:bg-yellow-900/20"
         />
       </div>

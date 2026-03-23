@@ -72,5 +72,9 @@ describe("useTransactionHistory", () => {
     result.current.transactions.forEach((txn) => {
       expect(txn.type).toBe("credit");
     });
+
+    // summary refleja todo el historial filtrado, no solo la página visible
+    expect(result.current.summary.totalDebit).toBe(0);
+    expect(result.current.summary.totalCredit).toBeGreaterThan(0);
   });
 });

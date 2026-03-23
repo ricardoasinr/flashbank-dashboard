@@ -13,10 +13,18 @@ export interface Transaction {
   reviewed: boolean;
 }
 
+/** Agregados sobre el historial completo que coincide con los filtros (no solo la página actual). */
+export interface TransactionSummary {
+  totalCredit: number;
+  totalDebit: number;
+  pendingCount: number;
+}
+
 export interface TransactionPage {
   data: Transaction[];
   nextCursor: string | null;
   total: number;
+  summary: TransactionSummary;
 }
 
 export interface TransactionFilters {

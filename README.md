@@ -122,9 +122,9 @@ Se usa `router.replace` (no `push`) para no contaminar el historial con cada cam
 
 La búsqueda por descripción aplica un debounce de 300ms antes de actualizar la URL y disparar el fetch. Es suficiente para usuarios que escriben a velocidad normal (~40 WPM) sin que la UI se sienta lenta.
 
-### `useMemo` sin sobre-memoizar
+### Resumen (totales) vs lista paginada
 
-`useMemo` se usa únicamente en `TransactionDashboard` para derivar las estadísticas de resumen (créditos/débitos/pendientes), ya que es un cómputo sobre el array completo de transacciones. Los componentes de presentación puros (`TransactionItem`, `Badge`, etc.) no necesitan memoización porque React es eficiente en re-renders pequeños.
+Las tarjetas **Total / Créditos / Débitos / Pendientes** usan `total` y `summary` que vienen en la **primera respuesta** del historial: el backend calcula agregados sobre **todo** el conjunto filtrado (500 ítems o los que correspondan), no sobre las filas ya cargadas en el cliente. Así los números no cambian al hacer scroll infinito. Los componentes de presentación puros (`TransactionItem`, `Badge`, etc.) no necesitan `useMemo` extra.
 
 ### Server Components vs Client Components
 

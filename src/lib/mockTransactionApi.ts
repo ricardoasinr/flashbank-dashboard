@@ -1,5 +1,28 @@
-import type { TransactionPage, TransactionType } from "@/types/transaction";
+import type {
+  Transaction,
+  TransactionPage,
+  TransactionSummary,
+  TransactionType,
+} from "@/types/transaction";
 import { getTransactionsForAccount, updateTransactionReviewed } from "@/mocks/db";
+
+export function computeTransactionSummary(transactions: Transaction[]): TransactionSummary {
+  let totalCredit = 0;
+  let totalDebit = 0;
+  let pendingCount = 0;
+
+  for (const t of transactions) {
+    if (t.type === "credit") totalCredit += t.amount;
+    else totalDebit += t.amount;
+    if (t.status === "pending") pendingCount += 1;
+  }
+
+  return {
+    totalCredit: Math.round(totalCredit * 100) / 100,
+    totalDebit: Math.round(totalDebit * 100) / 100,
+    pendingCount,
+  };
+}
 
 /** Lógica compartida entre MSW (dev) y Route Handlers (producción). */
 export function buildTransactionHistoryPage(
@@ -38,6 +61,8 @@ export function buildTransactionHistoryPage(
   }
 
   const total = transactions.length;
+  const summary = computeTransactionSummary(transactions);
+
   const startIndex = cursor
     ? transactions.findIndex((t) => t.id === cursor) + 1
     : 0;
@@ -48,6 +73,7 @@ export function buildTransactionHistoryPage(
     data: page,
     nextCursor,
     total,
+    summary,
   };
 }
 

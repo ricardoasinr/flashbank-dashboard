@@ -7,7 +7,18 @@ import {
   fetchTransactionHistory,
   markTransactionReviewed,
 } from "@/services/transactionService";
-import type { Transaction, TransactionFilters, TransactionPage } from "@/types/transaction";
+import type {
+  Transaction,
+  TransactionFilters,
+  TransactionPage,
+  TransactionSummary,
+} from "@/types/transaction";
+
+const EMPTY_SUMMARY: TransactionSummary = {
+  totalCredit: 0,
+  totalDebit: 0,
+  pendingCount: 0,
+};
 
 const STALE_TIME = 5 * 60 * 1000; // 5 minutos: los datos de historial cambian poco en el corto plazo
 const PAGE_SIZE = 20;
@@ -48,6 +59,9 @@ export function useTransactionHistory(
     data?.pages.flatMap((page) => page.data) ?? [];
 
   const total = data?.pages[0]?.total ?? 0;
+  /** Siempre del primer chunk: mismos agregados para todo el resultado filtrado. */
+  const summary: TransactionSummary =
+    data?.pages[0]?.summary ?? EMPTY_SUMMARY;
 
   const { mutate: markAsReviewed } = useMutation({
     mutationFn: (transactionId: string) =>
@@ -96,6 +110,7 @@ export function useTransactionHistory(
   return {
     transactions,
     total,
+    summary,
     isLoading,
     isError,
     error,
