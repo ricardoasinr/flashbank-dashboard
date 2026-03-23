@@ -50,9 +50,13 @@ export function TransactionList({
     }
   }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
+  // El sentinel debe vivir DENTRO del contenedor con scroll y el root del observer
+  // debe ser ese contenedor. Si el sentinel está fuera, el viewport lo deja “visible”
+  // casi siempre y React Query encadena fetchNextPage hasta traer todo el historial.
   useEffect(() => {
-    const el = loadMoreRef.current;
-    if (!el) return;
+    const root = parentRef.current;
+    const target = loadMoreRef.current;
+    if (!root || !target) return;
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -60,12 +64,16 @@ export function TransactionList({
           handleLoadMore();
         }
       },
-      { threshold: 0.1 },
+      {
+        root,
+        rootMargin: "120px",
+        threshold: 0,
+      },
     );
 
-    observer.observe(el);
+    observer.observe(target);
     return () => observer.disconnect();
-  }, [handleLoadMore]);
+  }, [handleLoadMore, transactions.length, hasNextPage]);
 
   if (isLoading) {
     return (
@@ -182,25 +190,29 @@ export function TransactionList({
             );
           })}
         </div>
-      </div>
 
-      {/* Sentinel para infinite scroll */}
-      <div ref={loadMoreRef} className="mt-4 flex justify-center" aria-live="polite">
-        {isFetchingNextPage && (
-          <div
-            role="status"
-            aria-label="Cargando más transacciones"
-            className="flex items-center gap-2 text-sm text-slate-500"
-          >
-            <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
-            Cargando más...
-          </div>
-        )}
-        {!hasNextPage && transactions.length > 0 && (
-          <p className="text-xs text-slate-400 dark:text-slate-600">
-            Has llegado al final del historial
-          </p>
-        )}
+        {/* Sentinel al final del contenido scrolleable (no fuera del overflow) */}
+        <div
+          ref={loadMoreRef}
+          className="flex min-h-[56px] flex-col items-center justify-center py-3"
+          aria-live="polite"
+        >
+          {isFetchingNextPage && (
+            <div
+              role="status"
+              aria-label="Cargando más transacciones"
+              className="flex items-center gap-2 text-sm text-slate-500"
+            >
+              <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
+              Cargando más...
+            </div>
+          )}
+          {!hasNextPage && transactions.length > 0 && (
+            <p className="text-xs text-slate-400 dark:text-slate-600">
+              Has llegado al final del historial
+            </p>
+          )}
+        </div>
       </div>
     </section>
   );
