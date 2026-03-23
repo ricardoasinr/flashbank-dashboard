@@ -51,7 +51,7 @@ export function useTransactionHistory(
 
   const { mutate: markAsReviewed } = useMutation({
     mutationFn: (transactionId: string) =>
-      markTransactionReviewed(transactionId),
+      markTransactionReviewed(transactionId, accountId),
 
     onMutate: async (transactionId: string) => {
       await queryClient.cancelQueries({ queryKey });
@@ -85,7 +85,10 @@ export function useTransactionHistory(
       }
     },
 
-    onSettled: () => {
+    // En producción (Route Handlers serverless) el “reviewed” en memoria no se comparte
+    // entre instancias; invalidar aquí puede pisar el optimistic update tras el refetch.
+    onSettled: (_data, error) => {
+      if (error || process.env.NODE_ENV === "production") return;
       queryClient.invalidateQueries({ queryKey });
     },
   });

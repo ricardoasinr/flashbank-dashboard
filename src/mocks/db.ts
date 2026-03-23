@@ -25,14 +25,34 @@ const DESCRIPTIONS = [
 
 const TYPES: TransactionType[] = ["credit", "debit"];
 
-function randomFrom<T>(arr: T[]): T {
-  return arr[Math.floor(Math.random() * arr.length)];
+/** PRNG determinista por cuenta + índice (serverless y MSW comparten la misma “fuente de verdad”). */
+function mulberry32(seed: number) {
+  return function next() {
+    let t = (seed += 0x6d2b79f5);
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+function seedFor(accountId: string, index: number): number {
+  let h = 2166136261;
+  for (let i = 0; i < accountId.length; i++) {
+    h ^= accountId.charCodeAt(i);
+    h = Math.imul(h, 16777619);
+  }
+  return (h + index * 41) >>> 0;
+}
+
+function randomFrom<T>(arr: T[], next: () => number): T {
+  return arr[Math.floor(next() * arr.length)];
 }
 
 function generateTransaction(index: number, accountId: string): Transaction {
-  const type = randomFrom(TYPES);
+  const next = mulberry32(seedFor(accountId, index));
+  const type = randomFrom(TYPES, next);
   const statusWeights = [0.1, 0.8, 0.1];
-  const rand = Math.random();
+  const rand = next();
   const status: TransactionStatus =
     rand < statusWeights[0]
       ? "pending"
@@ -40,7 +60,7 @@ function generateTransaction(index: number, accountId: string): Transaction {
         ? "completed"
         : "failed";
 
-  const daysAgo = Math.floor(Math.random() * 365);
+  const daysAgo = Math.floor(next() * 365);
   const date = new Date();
   date.setDate(date.getDate() - daysAgo);
 
@@ -48,12 +68,12 @@ function generateTransaction(index: number, accountId: string): Transaction {
     id: `txn-${accountId}-${index}`,
     accountId,
     type,
-    amount: parseFloat((Math.random() * 9900 + 100).toFixed(2)),
+    amount: parseFloat((next() * 9900 + 100).toFixed(2)),
     currency: "MXN",
-    description: randomFrom(DESCRIPTIONS),
+    description: randomFrom(DESCRIPTIONS, next),
     status,
     createdAt: date.toISOString(),
-    reviewed: Math.random() > 0.7,
+    reviewed: next() > 0.7,
   };
 }
 

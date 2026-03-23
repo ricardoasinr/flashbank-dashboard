@@ -32,10 +32,17 @@ export async function fetchTransactionHistory(
 
 export async function markTransactionReviewed(
   transactionId: string,
+  accountId: string,
 ): Promise<void> {
-  const res = await fetch(`${BASE_URL}/transactions/${transactionId}/reviewed`, {
-    method: "PATCH",
-  });
+  const qs = new URLSearchParams();
+  qs.set("accountId", accountId);
+
+  const res = await fetch(
+    `${BASE_URL}/transactions/${transactionId}/reviewed?${qs.toString()}`,
+    {
+      method: "PATCH",
+    },
+  );
 
   if (!res.ok) {
     throw new Error(`Error ${res.status}: ${res.statusText}`);
