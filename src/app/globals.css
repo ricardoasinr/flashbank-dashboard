@@ -8,7 +8,9 @@
   }
 
   body {
-    @apply text-slate-900 antialiased;
+    @apply font-sans text-slate-900 antialiased;
+    font-feature-settings: "cv11", "ss01";
+    font-variation-settings: "opsz" 32;
   }
 
   *:focus-visible {

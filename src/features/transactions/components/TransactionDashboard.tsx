@@ -113,7 +113,7 @@ function StatCard({ icon, label, value, bg }: StatCardProps) {
       <div className="flex-shrink-0">{icon}</div>
       <div className="min-w-0">
         <p className="text-xs font-medium text-slate-500 dark:text-slate-400">{label}</p>
-        <p className="truncate text-sm font-semibold text-slate-800 dark:text-slate-100">
+        <p className="truncate font-mono text-sm font-semibold text-slate-800 dark:text-slate-100">
           {value}
         </p>
       </div>

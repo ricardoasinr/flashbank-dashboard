@@ -99,7 +99,7 @@ export function TransactionItem({
       <div className="flex flex-col items-end gap-1.5">
         <span
           className={cn(
-            "text-sm font-semibold tabular-nums",
+            "font-mono text-sm font-semibold tabular-nums",
             transaction.type === "credit"
               ? "text-emerald-600 dark:text-emerald-400"
               : "text-slate-800 dark:text-slate-200",
