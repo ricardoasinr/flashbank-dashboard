@@ -138,7 +138,7 @@ export function TransactionFilters({
         {/* Monto */}
         <div className="flex flex-col gap-1">
           <span className="text-xs font-medium text-slate-500 dark:text-slate-400">
-            Monto (MXN)
+            Monto (BOB)
           </span>
           <div className="flex items-center gap-1">
             <input

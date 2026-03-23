@@ -27,8 +27,8 @@ export function TransactionDashboard({ accountId }: TransactionDashboardProps) {
     markAsReviewed,
   } = useTransactionHistory(accountId, filters);
 
-  const formatMXN = (amount: number) =>
-    new Intl.NumberFormat("es-MX", { style: "currency", currency: "MXN" }).format(
+  const formatBOB = (amount: number) =>
+    new Intl.NumberFormat("es-BO", { style: "currency", currency: "BOB" }).format(
       amount,
     );
 
@@ -45,13 +45,13 @@ export function TransactionDashboard({ accountId }: TransactionDashboardProps) {
         <StatCard
           icon={<TrendingUp className="h-5 w-5 text-emerald-500" />}
           label="Créditos"
-          value={formatMXN(summary.totalCredit)}
+          value={formatBOB(summary.totalCredit)}
           bg="bg-emerald-50 dark:bg-emerald-900/20"
         />
         <StatCard
           icon={<TrendingDown className="h-5 w-5 text-red-500" />}
           label="Débitos"
-          value={formatMXN(summary.totalDebit)}
+          value={formatBOB(summary.totalDebit)}
           bg="bg-red-50 dark:bg-red-900/20"
         />
         <StatCard

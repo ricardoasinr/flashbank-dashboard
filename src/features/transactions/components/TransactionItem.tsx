@@ -48,7 +48,7 @@ export function TransactionItem({
     locale: es,
   });
 
-  const formattedAmount = new Intl.NumberFormat("es-MX", {
+  const formattedAmount = new Intl.NumberFormat("es-BO", {
     style: "currency",
     currency: transaction.currency,
   }).format(transaction.amount);

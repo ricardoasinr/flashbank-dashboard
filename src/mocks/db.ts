@@ -69,7 +69,7 @@ function generateTransaction(index: number, accountId: string): Transaction {
     accountId,
     type,
     amount: parseFloat((next() * 9900 + 100).toFixed(2)),
-    currency: "MXN",
+    currency: "BOB",
     description: randomFrom(DESCRIPTIONS, next),
     status,
     createdAt: date.toISOString(),
